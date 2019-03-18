@@ -6,8 +6,9 @@ import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
 import org.specs2.mock.Mockito
 import akka.testkit.{TestFSMRef, TestKit}
-import akka.actor.{FSM, ActorSystem}
+import akka.actor.{ActorSystem, FSM}
 import ChargerActor._
+
 import scala.concurrent.duration.FiniteDuration
 
 /**
@@ -60,6 +61,13 @@ class ChargerActorSpec extends SpecificationWithJUnit with Mockito {
       actor receive Unplug(1)
       actor.stateData mustEqual NoData
       expectMsg(ConnectorActor.Unplug)
+    }
+
+    "start transaction on RemoteStart requested" in new ChargerActorScope {
+      actor receive Plug(1)
+      expectMsg(ConnectorActor.Plug)
+      actor receive RemoteStartTransaction(card, 1)
+      expectMsg(ConnectorActor.RemoteStart(card))
     }
 
 

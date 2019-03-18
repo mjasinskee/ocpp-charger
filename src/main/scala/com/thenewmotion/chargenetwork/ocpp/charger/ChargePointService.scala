@@ -2,18 +2,22 @@ package com.thenewmotion.chargenetwork.ocpp.charger
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import com.thenewmotion.ocpp.messages._
-import akka.actor.{Actor, Props, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.util.Timeout
 import akka.pattern.ask
+
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import java.util.concurrent.TimeoutException
+
 import org.apache.commons.net.ftp.FTPSClient
 import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
+
 import com.thenewmotion.time.Imports.DateTime
 import java.text.SimpleDateFormat
 import java.net.URI
+
 import scala.language.postfixOps
 
 /**
@@ -21,12 +25,20 @@ import scala.language.postfixOps
  */
 class ChargePointService(chargerId: String, actor: ActorRef) extends ChargePoint with LazyLogging {
   val uploadActor = system.actorOf(Props[Uploader])
+  val chargerActor = system.actorOf(Props[ChargerActor])
 
   def clearCache = ClearCacheRes(accepted = false)
 
-  def remoteStartTransaction(req: RemoteStartTransactionReq) = RemoteStartTransactionRes(accepted = false)
+  def remoteStartTransaction(req: RemoteStartTransactionReq) = {
+    logger.info(s"Request form CentralSystem $req")
+    chargerActor ! RemoteStartTransaction(req.idTag.toString, 1)
+    RemoteStartTransactionRes(accepted = true)
+  }
 
-  def remoteStopTransaction(req: RemoteStopTransactionReq) = RemoteStopTransactionRes(accepted = false)
+  def remoteStopTransaction(req: RemoteStopTransactionReq) = {
+    logger.info(s"Request form CentralSystem $req")
+    chargerActor ! RemoteStopTransaction(req.transactionId)
+    RemoteStopTransactionRes(accepted = true)}
 
   def unlockConnector(req: UnlockConnectorReq) = UnlockConnectorRes(accepted = false)
 
@@ -92,3 +104,6 @@ class Uploader extends Actor with LazyLogging {
 }
 
 case class UploadJob(location: URI, filename: String)
+
+case class RemoteStartTransaction(rfid: String, connector: Int)
+case class RemoteStopTransaction(transactionId: Int)

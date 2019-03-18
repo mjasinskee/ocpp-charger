@@ -24,6 +24,10 @@ class ConnectorActor(service: ConnectorService)
         goto(Charging) using ChargingData(sessionId, initialMeterValue)
       }
       else stay()
+    case Event(RemoteStart(rfid), _) =>
+    // TODO: without authorization for now
+      val sessionId = service.startSession(rfid, initialMeterValue)
+      goto(Charging) using ChargingData(sessionId, initialMeterValue)
     case Event(Unplug, _) =>
       service.available()
       goto(Available)
@@ -72,4 +76,7 @@ object ConnectorActor {
   case class ChargingData(transactionId: Int, meterValue: Int) extends Data
 
   case object SendMeterValue
+
+  case class RemoteStart(rfid: String) extends Action
+
 }

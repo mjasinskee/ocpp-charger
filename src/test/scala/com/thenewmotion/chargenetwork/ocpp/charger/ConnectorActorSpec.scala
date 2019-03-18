@@ -7,7 +7,6 @@ import org.specs2.mock.Mockito
 import org.specs2.specification.Scope
 import akka.actor.ActorSystem
 import ConnectorActor._
-import com.thenewmotion.chargenetwork.{ocpp => xb}
 
 /**
  * @author Yaroslav Klymko
@@ -92,6 +91,13 @@ class ConnectorActorSpec extends SpecificationWithJUnit with Mockito {
       system.awaitTermination()
 
       there was one(service).stopSession(None, 12345, ConnectorActor.initialMeterValue)
+    }
+
+    "start charging on remote start requested" in new ConnectorActorScope {
+      actor.setState(stateName = Connected)
+      actor receive RemoteStart(rfid)
+      actor.stateName mustEqual Charging
+      there was one(service).startSession(rfid, initialMeterValue)
     }
   }
 

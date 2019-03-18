@@ -46,6 +46,11 @@ class ChargerActor(service: BosService, numberOfConnectors: Int = 1)
     case Event(SwipeCard(c, card), PluggedConnectors(cs)) =>
       if (cs.contains(c)) dispatch(ConnectorActor.SwipeCard(card), c)
       stay()
+    case Event(RemoteStartTransaction(rfid, connector), PluggedConnectors(cs)) =>
+      if (cs.contains(connector)) dispatch(ConnectorActor.RemoteStart(rfid), connector)
+      stay()
+    case Event(RemoteStopTransaction(transactionId), PluggedConnectors(cs)) =>
+    // TODO: dispach event
     case Event(Fault, _) =>
       service.fault()
       goto(Faulted) forMax 5.seconds
