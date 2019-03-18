@@ -18,6 +18,8 @@ import com.thenewmotion.time.Imports.DateTime
 import java.text.SimpleDateFormat
 import java.net.URI
 
+import com.thenewmotion.chargenetwork.ocpp.charger.ChargerActor.{RemoteStartTransaction, RemoteStopTransaction}
+
 import scala.language.postfixOps
 
 /**
@@ -25,19 +27,19 @@ import scala.language.postfixOps
  */
 class ChargePointService(chargerId: String, actor: ActorRef) extends ChargePoint with LazyLogging {
   val uploadActor = system.actorOf(Props[Uploader])
-  val chargerActor = system.actorOf(Props[ChargerActor])
+//  val chargerActor = system.actorOf(Props[ChargerActor])
 
   def clearCache = ClearCacheRes(accepted = false)
 
   def remoteStartTransaction(req: RemoteStartTransactionReq) = {
     logger.info(s"Request form CentralSystem $req")
-    chargerActor ! RemoteStartTransaction(req.idTag.toString, 1)
+//    chargerActor ! RemoteStartTransaction(req.idTag.toString, 1)
     RemoteStartTransactionRes(accepted = true)
   }
 
   def remoteStopTransaction(req: RemoteStopTransactionReq) = {
     logger.info(s"Request form CentralSystem $req")
-    chargerActor ! RemoteStopTransaction(req.transactionId)
+//    chargerActor ! RemoteStopTransaction(req.transactionId)
     RemoteStopTransactionRes(accepted = true)}
 
   def unlockConnector(req: UnlockConnectorReq) = UnlockConnectorRes(accepted = false)
@@ -104,6 +106,3 @@ class Uploader extends Actor with LazyLogging {
 }
 
 case class UploadJob(location: URI, filename: String)
-
-case class RemoteStartTransaction(rfid: String, connector: Int)
-case class RemoteStopTransaction(transactionId: Int)

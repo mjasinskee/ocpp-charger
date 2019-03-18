@@ -12,16 +12,16 @@ object ChargerApp {
 
   def main(args: Array[String]) {
     object config extends ScallopConf(args) {
-      val chargerId = opt[String]("id", descr = "Charge point ID of emulated charge point", default = Some("00055103978E"))
+      val chargerId = opt[String]("id", descr = "Charge point ID of emulated charge point", default = Some("NUON_00001"))
       val numberOfConnectors = opt[Int]("connectors", descr = "Number of connectors of emulated charge point", default = Some(2))
       val passId = opt[String]("pass-id", descr = "RFID of pass to try to start sessions with", default = Some("3E60A5E2"))
       val protocolVersion = opt[String]("protocol-version", descr = "OCPP version (either \"1.2\" or \"1.5\"", default = Some("1.5"))
-      val connectionType = opt[String]("connection-type", descr = "whether to use WebSocket/JSON or HTTP/SOAP (either  \"json\" or \"soap\")", default = Some("json"))
+      val connectionType = opt[String]("connection-type", descr = "whether to use WebSocket/JSON or HTTP/SOAP (either  \"json\" or \"soap\")", default = Some("soap"))
       val listenPort = opt[Short]("listen", descr = "TCP port to listen on for remote commands", default = Some(8084.toShort))
       val authPassword = opt[String]("auth-password", descr = "set basic auth password", default = None)
       val keystoreFile = opt[String]("keystore-file", descr = "keystore file for ssl", default = None)
       val keystorePassword = opt[String]("keystore-password", descr = "keystore password", default = Some(""))
-      val chargeServerUrl = trailArg[String](descr = "Charge server URL base (without trailing slash)", default = Some("http://127.0.0.1:8080/ocppws"))
+      val chargeServerUrl = trailArg[String](descr = "Charge server URL base (without trailing slash)", default = Some("http://10.248.21.107:80/emobility-backend-web/CentralSystemService_V1_5"))
     }
 
     config.verify()

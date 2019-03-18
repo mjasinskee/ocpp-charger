@@ -23,12 +23,12 @@ class ChargerServer(port: Int) {
   val actor: ActorRef = {
     implicit val timeout = Timeout(1 second)
     val actor = system.actorOf(Props(new ChargerServerActor))
-    val future = IO(Http) ? Http.Bind(actor, interface = "localhost", port = port)
+    val future = IO(Http) ? Http.Bind(actor, interface = "192.168.8.107", port = port)
     Await.result(future, timeout.duration)
     actor
   }
 
-  def url = new URI(s"http://localhost:$port")
+  def url = new URI(s"http://192.168.8.107:$port")
 
   class ChargerServerActor extends Actor {
     var map: Map[String, ChargePoint] = Map()

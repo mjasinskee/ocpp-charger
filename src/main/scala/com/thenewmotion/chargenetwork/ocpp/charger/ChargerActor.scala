@@ -31,7 +31,7 @@ class ChargerActor(service: BosService, numberOfConnectors: Int = 1)
   }
 
   def scheduleFault() {
-    context.system.scheduler.scheduleOnce(30 seconds, self, Fault)
+//    context.system.scheduler.scheduleOnce(30 seconds, self, Fault)
   }
 
   startWith(Available, NoData)
@@ -51,6 +51,7 @@ class ChargerActor(service: BosService, numberOfConnectors: Int = 1)
       stay()
     case Event(RemoteStopTransaction(transactionId), PluggedConnectors(cs)) =>
     // TODO: dispach event
+      stay()
     case Event(Fault, _) =>
       service.fault()
       goto(Faulted) forMax 5.seconds
@@ -160,6 +161,11 @@ object ChargerActor {
   case class Plug(connector: Int) extends UserAction
   case class Unplug(connector: Int) extends UserAction
   case class SwipeCard(connector: Int, card: String) extends UserAction
+
+  sealed trait CSAction extends Action
+  case class RemoteStartTransaction(rfid: String, connector: Int) extends CSAction
+  case class RemoteStopTransaction(transactionId: Int) extends CSAction
+
 }
 
 case class LocalAuthList(version: AuthListSupported = AuthListSupported(0),
